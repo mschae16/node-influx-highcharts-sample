@@ -22,9 +22,14 @@ const options = {
 
 http.get(options, (res) => {
   console.log("Got response: " + res.statusCode);
+
+  res.on("data", (chunk) => {
+    console.log("BODY: " + chunk);
+  });
 }).on('error', (e) => {
   console.log("Got error: " + e.message);
 });
+
 
 app.get('/', (request, response) => {
   response.send('Hello world!');
