@@ -1,5 +1,4 @@
 const Influx = require('influx');
-const http = require('http');
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -68,5 +67,18 @@ influx.getDatabaseNames()
   .catch(error => console.log({ error }));
 
 app.get('/', (request, response) => {
-  response.json('Hello world!');
+  response.send('Hello world!');
+});
+
+app.get('/api/v1/tide/:place', (request, response) => {
+  const { place } = request.params;
+
+  influx.query(`
+    select * from tide
+    where location =~ /[${place}]/
+    order by time desc
+    limit 10
+  `)
+  .then( result => response.status(200).json(result) )
+  .catch( error => response.status(500).json({ error }) );
 });
