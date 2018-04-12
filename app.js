@@ -2,9 +2,11 @@ const Influx = require('influx');
 const http = require('http');
 const express = require('express');
 const path = require('path');
-const os = require('os');
 const bodyParser = require('body-parser');
-const apiKey = require('./key.js');
+const hanalei = require('./data/tides-hanalei.js');
+const hilo = require('./data/tides-hilo.js');
+const honolulu = require('./data/tides-honolulu.js');
+const kahului = require('./data/tides-kahului.js');
 const app = express();
 
 app.use(bodyParser.json());
@@ -14,27 +16,57 @@ app.use(bodyParser.urlencoded({
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('port', 3000);
 
-const options = {
-  host: 'api.wunderground.com',
-  port: 80,
-  path: `/api/${apiKey}/tide/q/HI/Hanalei.json`,
-};
-
-http.get(options, (res) => {
-  console.log("Got response: " + res.statusCode);
-
-  res.on("data", (chunk) => {
-    console.log("BODY: " + chunk);
-  });
-}).on('error', (e) => {
-  console.log("Got error: " + e.message);
+const influx = new Influx.InfluxDB({
+  host: 'localhost',
+  database: 'ocean_tides',
+  schema: [
+    {
+      measurement: 'tide',
+      fields: { height: Influx.FieldType.FLOAT },
+      tags: ['unit', 'location']
+    }
+  ]
 });
 
+const writeDataToInflux = (locationObj) => {
+  locationObj.rawtide.rawTideObs.forEach( tidePoint => {
+    influx.writePoints([
+      {
+        measurement: 'tide',
+        tags: {
+          unit: locationObj.rawtide.tideInfo[0].units,
+          location: locationObj.rawtide.tideInfo[0].tideSite,
+        },
+        fields: { height: tidePoint.height },
+        timestamp: tidePoint.epoch,
+      }
+    ], {
+      database: 'ocean_tides',
+      precision: 's',
+    })
+    .catch(error => {
+      console.error(`Error saving data to InfluxDB! ${err.stack}`)
+    });
+  });
+}
+
+influx.getDatabaseNames()
+  .then(names => {
+    if (!names.includes('ocean_tides')) {
+      return influx.createDatabase('ocean_tides');
+    }
+  })
+  .then(() => {
+    app.listen(app.get('port'), () => {
+      console.log(`Listening on ${app.get('port')}.`);
+    });
+    writeDataToInflux(hanalei);
+    writeDataToInflux(hilo);
+    writeDataToInflux(honolulu);
+    writeDataToInflux(kahului);
+  })
+  .catch(error => console.log({ error }));
 
 app.get('/', (request, response) => {
-  response.send('Hello world!');
-});
-
-app.listen(app.get('port'), () => {
-  console.log(`Listening on ${app.get('port')}.`);
+  response.json('Hello world!');
 });
