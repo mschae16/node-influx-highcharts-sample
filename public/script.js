@@ -23,9 +23,14 @@ Promise.all([
       const mutatedArray = parsedRes.map( arr => {
         return Object.assign({}, {
           name: arr[0].location,
-          data: arr.map( obj => Object.assign({}, {x:moment(obj.time).unix(), y:obj.height}))
+          data: arr.map( obj => Object.assign({}, {
+            x: (moment(obj.time).unix())*1000,
+            y:obj.height
+          }))
         });
       });
+
+      console.log('data time', mutatedArray[0].data);
 
       const myChart = Highcharts.chart('container', {
           chart: {
@@ -35,9 +40,7 @@ Promise.all([
               text: 'Hawaii Ocean Tides'
           },
           xAxis: {
-            title: {
-              text: 'Time'
-            }
+            type: 'datetime'
           },
           yAxis: {
             title: {
