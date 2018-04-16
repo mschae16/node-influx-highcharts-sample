@@ -75,9 +75,8 @@ app.get('/api/v1/tide/:place', (request, response) => {
 
   influx.query(`
     select * from tide
-    where location =~ /[${place}]/
-    order by time desc
-    limit 10
+    where location =~ /(?i)(${place})/
+    limit 1000
   `)
   .then( result => response.status(200).json(result) )
   .catch( error => response.status(500).json({ error }) );
