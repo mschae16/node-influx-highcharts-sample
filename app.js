@@ -72,11 +72,10 @@ app.get('/', (request, response) => {
 
 app.get('/api/v1/tide/:place', (request, response) => {
   const { place } = request.params;
-
   influx.query(`
     select * from tide
     where location =~ /(?i)(${place})/
-    limit 1000
+
   `)
   .then( result => response.status(200).json(result) )
   .catch( error => response.status(500).json({ error }) );
