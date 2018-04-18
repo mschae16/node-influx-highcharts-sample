@@ -30,16 +30,16 @@ const fetchAllLocations = () => {
               });
 
               Highcharts.setOptions({
-                  colors: ['#78CAD2', '#62A8AC', '#5497A7', '#50858B']
+                  colors: ['#508991', '#175456', '#09BC8A', '#78CAD2']
               });
 
               Highcharts.chart('container', {
                 chart: {
                   backgroundColor: {
-                      linearGradient: [0, 350, 0, 0],
+                      linearGradient: [0, 600, 0, 0],
                       stops: [
-                        [0, 'rgb(161, 210, 206)'],
-                        [1, 'rgb(255, 255, 255)']
+                        [0, 'rgb(255, 255, 255)'],
+                        [1, 'rgb(161, 210, 206)']
                       ]
                   },
                   type: 'spline'
