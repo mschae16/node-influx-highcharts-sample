@@ -29,12 +29,16 @@ const fetchAllLocations = () => {
                 });
               });
 
-              const myChart = Highcharts.chart('container', {
+              Highcharts.setOptions({
+                  colors: ['#78CAD2', '#62A8AC', '#5497A7', '#50858B']
+              });
+
+              Highcharts.chart('container', {
                 chart: {
                   backgroundColor: {
                       linearGradient: [0, 350, 0, 0],
                       stops: [
-                        [0, 'rgb(110, 234, 234)'],
+                        [0, 'rgb(161, 210, 206)'],
                         [1, 'rgb(255, 255, 255)']
                       ]
                   },
@@ -61,7 +65,6 @@ const fetchAllLocations = () => {
             }
             return;
           });
-
 };
 
 fetchAllLocations();
