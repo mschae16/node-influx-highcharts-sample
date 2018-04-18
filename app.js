@@ -28,7 +28,7 @@ const influx = new Influx.InfluxDB({
 });
 
 const writeDataToInflux = (locationObj) => {
-  locationObj.rawtide.rawTideObs.forEach( tidePoint => {
+  locationObj.rawtide.rawTideObs.forEach(tidePoint => {
     influx.writePoints([
       {
         measurement: 'tide',
@@ -66,17 +66,12 @@ influx.getDatabaseNames()
   })
   .catch(error => console.log({ error }));
 
-app.get('/', (request, response) => {
-  response.send('Hello world!');
-});
-
 app.get('/api/v1/tide/:place', (request, response) => {
   const { place } = request.params;
   influx.query(`
     select * from tide
     where location =~ /(?i)(${place})/
-
   `)
-  .then( result => response.status(200).json(result) )
-  .catch( error => response.status(500).json({ error }) );
+  .then(result => response.status(200).json(result))
+  .catch(error => response.status(500).json({ error }));
 });
