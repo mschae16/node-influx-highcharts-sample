@@ -31,6 +31,13 @@ const fetchAllLocations = () => {
 
               const myChart = Highcharts.chart('container', {
                 chart: {
+                  backgroundColor: {
+                      linearGradient: [0, 350, 0, 0],
+                      stops: [
+                        [0, 'rgb(110, 234, 234)'],
+                        [1, 'rgb(255, 255, 255)']
+                      ]
+                  },
                   type: 'spline'
                 },
                 title: {
